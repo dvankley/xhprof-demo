@@ -4,8 +4,8 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Validator\Constraints\DateTime;
 use AppBundle\Repository\LinkRepository;
+use DateTime;
 
 /**
  * @ORM\Entity(repositoryClass="AppBundle\Repository\LinkRepository")
