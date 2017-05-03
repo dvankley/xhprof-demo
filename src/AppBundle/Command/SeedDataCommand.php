@@ -19,9 +19,9 @@ class SeedDataCommand extends ContainerAwareCommand {
 	/** @var OutputInterface */
 	protected $output;
 
-	protected $linksPerUserMax = 10;
-	protected $clicksPerLinkMax = 10;
-	protected $maxUserId = 10;
+	protected $linksPerUserMax = 500;
+	protected $clicksPerLinkMax = 800;
+	protected $maxUserId = 50;
 	protected $secondsPerLink = 3600;
 	/** @var EntityManager */
 	protected $em;
@@ -48,16 +48,23 @@ class SeedDataCommand extends ContainerAwareCommand {
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		$this->em = $this->getContainer()->get('doctrine.orm.entity_manager');
+		$this->em->getConnection()->getConfiguration()->setSQLLogger(null);
 		$this->input = $input;
 		$this->output = $output;
+		gc_enable();
 
 		$this->purgeData();
 
 		for ($userId = 0; $userId < $this->maxUserId; $userId++) {
 			$this->generateUserData($userId);
+			$this->output->writeln("Incremental flush...");
+			$this->em->flush();
+			$this->em->clear();
+			gc_collect_cycles();
 		}
-		$this->output->writeln("Flushing queries...");
+		$this->output->writeln("Final flush...");
 		$this->em->flush();
+		$this->em->close();
 		$this->output->writeln("DONE");
 	}
 
